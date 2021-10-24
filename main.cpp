@@ -105,7 +105,8 @@ Vec3 offset(const Vec3& p,
             const Vec3& p1,
             const Vec3& p2,
             float margin) {
-    //TODO
+    
+    
 }
 
 int main() {
@@ -149,9 +150,15 @@ int main() {
         assert(e.size() >= 3);
     }
 
-    // 
-    
+    // // test matrix
+    // Mat33 m;
+    // m[0] = Vec3(1, -1, 0);
+    // m[1] = Vec3(0, 5, 3);
+    // m[2] = Vec3(2, 0, -9);
+    // std::cout << m << std::endl;
+    // std::cout << m.inv() << std::endl;
 
+    
     
     
     return 0;
