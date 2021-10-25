@@ -105,29 +105,48 @@ Vec3 offset(const Vec3& p,
             const Vec3& p1,
             const Vec3& p2,
             float margin) {
-    
-    
+    Vec3 u = p0 - p;
+    Vec3 v = p1 - p;
+    Vec3 w = p2 - p;
+
+    // determine 'outward' direction
+    // TODO: add tolerance
+    Vec3 n_uv = cross(u, v);
+    n_uv = dot(n_uv, w) < 0 ? n_uv : -n_uv;
+
+    Vec3 n_uw = cross(u, w);
+    n_uw = dot(n_uw, v) < 0 ? n_uw : -n_uw;
+
+    Vec3 n_vw = cross(v, w);
+    n_vw = dot(n_vw, u) < 0 ? n_vw : -n_vw;
+
+    Mat33 A(n_uv, n_uw, n_vw);
+    A = A.t();
+
+    Vec3 B(length(n_uv), length(n_uw), length(n_vw));
+
+    return p + A.inv() * margin * B;
 }
 
 int main() {
-    std::vector<Vec3> points = {
-        Vec3(1, 1, 1),
-        Vec3(-1, 1, 1),
-        Vec3(-1, -1, 1),
-        Vec3(1, -1, 1),
-        Vec3(1, 1, -1),
-        Vec3(-1, 1, -1),
-        Vec3(-1, -1, -1),
-        Vec3(1, -1, -1)
-    };
-
     // std::vector<Vec3> points = {
-    //     Vec3(1, 0, 0),
-    //     Vec3(0, 1, 0),
-    //     Vec3(-1, 0, 0),
-    //     Vec3(0, -1, 0),
-    //     Vec3(0, 0, 1)
+    //     Vec3(1, 1, 1),
+    //     Vec3(-1, 1, 1),
+    //     Vec3(-1, -1, 1),
+    //     Vec3(1, -1, 1),
+    //     Vec3(1, 1, -1),
+    //     Vec3(-1, 1, -1),
+    //     Vec3(-1, -1, -1),
+    //     Vec3(1, -1, -1)
     // };
+
+    std::vector<Vec3> points = {
+        Vec3(1, 0, 0),
+        Vec3(0, 1, 0),
+        Vec3(-1, 0, 0),
+        Vec3(0, -1, 0),
+        Vec3(0, 0, 1)
+    };
 
     for (size_t index = 0; index < points.size(); ++index) {
         std::cout << points[index] << "\t@" << index << std::endl;
@@ -158,7 +177,21 @@ int main() {
     // std::cout << m << std::endl;
     // std::cout << m.inv() << std::endl;
 
+    for (size_t index = 0; index < points.size(); ++index) {
+
+        std::set<size_t>::iterator s_it = eg[index].begin();
+        Vec3 p = points[index];
+        Vec3 p0 = points[*s_it++];
+        Vec3 p1 = points[*s_it++];
+        Vec3 p2 = points[*s_it];
+        
+        points[index] = offset(p, p0, p1, p2, 0.04);
+    }
     
+    for (size_t index = 0; index < points.size(); ++index) {
+        std::cout << points[index] << "\t@" << index << std::endl;
+    }
+
     
     
     return 0;

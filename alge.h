@@ -18,6 +18,10 @@ bool as_positive(float n) {
     return n > small;
 }
 
+struct Vec3;
+
+float dot(const Vec3& a, const Vec3& b);
+
 struct Vec3 {
     float x;
     float y;
@@ -27,10 +31,19 @@ struct Vec3 {
     
     Vec3(float x_, float y_, float z_) : x(x_), y(y_), z(z_) {};
 
+
+    Vec3 operator+(const Vec3& v) const {
+        return Vec3(x + v.x, y + v.y, z + v.z);
+    }
+    
     Vec3 operator-(const Vec3& v) const {
         return Vec3(x - v.x, y - v.y, z - v.z);
     }
 
+    Vec3 operator-() const {
+        return Vec3(-x, -y, -z);
+    }
+    
     float& operator[](size_t n) {
         return *(reinterpret_cast<float*>(this) + n);
     }
@@ -47,6 +60,14 @@ struct Vec3 {
 
 struct Mat33 {
 
+    Mat33() {};
+    
+    Mat33(const Vec3& col0, const Vec3& col1, const Vec3& col2) {
+        _cols[0] = col0;
+        _cols[1] = col1;
+        _cols[2] = col2;
+    }
+    
     Vec3& operator[](size_t n) {
         return _cols[n];
     }
@@ -61,6 +82,17 @@ struct Mat33 {
             for (size_t j = 0; j < 3; ++j) {
                 result[i][j] = _cols[i][j] * r;
             }
+        }
+
+        return result;
+    }
+
+
+    Vec3 operator*(const Vec3& r) const {
+        Vec3 result;
+        for (size_t i = 0; i < 3; ++i) {
+            Vec3 row(_cols[0][i], _cols[1][i], _cols[2][i]);
+            result[i] = dot(row, r);
         }
 
         return result;
